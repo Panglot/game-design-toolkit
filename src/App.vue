@@ -4,6 +4,9 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/combat-simulation">Combat Simulation</router-link>
     </nav>
+    <h3 style="text-align:center">
+      Туй е дефолтната страница на Vue Js. ↑ В менюто над текста е симулатора.
+    </h3>
     <router-view />
   </div>
 </template>
@@ -25,7 +28,7 @@ nav {
     font-weight: bold;
     color: #2c3e50;
     &.router-link-exact-active {
-      color: #42b983;
+      color: #773b88;
     }
   }
 }

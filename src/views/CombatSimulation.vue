@@ -14,6 +14,10 @@
         </div>
       </div>
     </div>
+    <hr />
+    <div>
+      <h2>Test</h2>
+    </div>
   </div>
 </template>
 
@@ -70,6 +74,8 @@ export default {
 
 <style lang="scss">
 .simulation {
+  text-align: center;
+
   h1,
   h2,
   h3 {
@@ -87,14 +93,35 @@ export default {
     display: inline-block;
     border: 1px solid black;
     border-radius: 0.5rem;
+    background-color: aliceblue;
     padding: 1rem;
     margin: 1rem;
     max-width: 30rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+      0 3px 6px rgba(0, 0, 0, 0.23);
+    -moz-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+      0 3px 6px rgba(0, 0, 0, 0.23);
+    -ms-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    -o-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+
+    &:hover {
+      background-color: azure;
+
+      -webkit-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19),
+        0 6px 6px rgba(0, 0, 0, 0.23);
+      -moz-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19),
+        0 6px 6px rgba(0, 0, 0, 0.23);
+      -ms-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19),
+        0 6px 6px rgba(0, 0, 0, 0.23);
+      -o-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19),
+        0 6px 6px rgba(0, 0, 0, 0.23);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    }
 
     input {
-      text-align: inherit;
+      text-align: left;
       font-family: inherit;
       font-size: inherit;
       border: none;
@@ -111,6 +138,7 @@ export default {
     }
     h3 input {
       max-width: 10rem;
+      text-align: center;
     }
 
     .properties {
