@@ -53,7 +53,7 @@ export default [
       },
       attackOrder: { 
         name: 'Attack order',
-        value: 1
+        value: 2
       }
     }
   }
