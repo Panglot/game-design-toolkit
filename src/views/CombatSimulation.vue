@@ -13,22 +13,27 @@
             <input type="number" v-model="property.value">
           </div>
         </div>
+        <button @click="removeUnit(index)">x</button>
       </div>
       <button @click="addUnit">Add unit +</button>
       <hr>
     </div>
     <!-- Armies -->
     <div class="armies">
-      <div v-for="(army, index) in armies" :key="index" class="army">
-        <h3>Army {{index+1}}</h3>
-        <div v-for="(unitBundle, index) in army" :key="index">
+      <div v-for="(army, armyIndex) in armies" :key="armyIndex" class="army">
+        <h3>Army {{armyIndex+1}}</h3>
+
+        <div v-for="(unitBundle, unitBundleIndex) in army" :key="unitBundleIndex">
           <select v-model="unitBundle.unitType">
             <option value=""></option>
             <option v-for="(unit, index) in units" :key="index" :value="unit.name">{{ unit.name }}</option>
           </select>
           <input type="number" placeholder="amount" v-model="unitBundle.amount">
+          <button @click="removeUnitBundle(armyIndex, unitBundleIndex)">x</button>
         </div>
-        <button @click="addBundle(index)">Add +</button>
+        
+        <button @click="addUnitBundle(armyIndex)">Add +</button>
+
         <div class="armyData">
           <div v-for="(unitBundle, index) in army" :key="index">
             <h4>{{ unitBundle.unitType }}</h4>
@@ -94,9 +99,8 @@ export default {
     generateSimulation() {
       
     },
-    addBundle(index) {
-      this.armies[index].push({ unitType: '', amount: ''})
-    },
+    addUnitBundle(index) { this.armies[index].push({ unitType: '', amount: ''}) },
+    removeUnitBundle(armyIndex, unitBundleIndex) {  this.armies[armyIndex].splice(unitBundleIndex, 1); },
     addUnit() {
       this.units.push({
         name: '',
@@ -127,7 +131,8 @@ export default {
           }
         }
       })
-    }
+    },
+    removeUnit(index) { this.units.splice(index, 1); }
   }
 };
 </script>

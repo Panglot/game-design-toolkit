@@ -2,11 +2,9 @@
   <div id="app">
     <nav>
       <router-link to="/">Home</router-link> |
-      <router-link to="/combat-simulation">Combat Simulation</router-link>
+      <router-link to="/combat-simulation">Combat Simulation</router-link> |
+      <router-link to="/vue-info-page">Vue Info Page</router-link>
     </nav>
-    <h3 style="text-align:center">
-      Туй е дефолтната страница на Vue Js. ↑ В менюто над текста е симулатора.
-    </h3>
     <router-view />
   </div>
 </template>

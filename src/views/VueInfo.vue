@@ -1,5 +1,7 @@
 <template>
   <div class="hello">
+    <img alt="Vue logo" src="../assets/logo.png" />
+    
     <h1>{{ msg }}</h1>
     <p>
       For a guide and recipes on how to configure / customize this project,<br />
@@ -96,7 +98,7 @@
 
 <script>
 export default {
-  name: "HelloWorld",
+  name: "VueInfo",
   props: {
     msg: String
   }
@@ -118,5 +120,8 @@ li {
 }
 a {
   color: #42b983;
+}
+.hello {
+  text-align: center;
 }
 </style>
