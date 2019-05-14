@@ -1,73 +1,133 @@
 <template>
   <div class="simulation">
     <h1>Simulation</h1>
-    <div v-for="(unit, index) in units" :key="index" class="unit">
-      <h3><input type="text" v-model="unit.name" /></h3>
-      <div class="properties">
-        <div
-          v-for="(property, index) in unit.properties"
-          :key="index"
-          class="property"
-        >
-          <span>{{ property.name }}</span>
-          <input type="number" v-model="property.content" />
+    <!-- Units -->
+    <div class="units">
+      <div v-for="(unit, index) in units" :key="index" class="unit">
+        <h3>
+          <input type="text" v-model="unit.name">
+        </h3>
+        <div class="properties">
+          <div v-for="(property, index) in unit.properties" :key="index" class="property">
+            <span>{{ property.name }}</span>
+            <input type="number" v-model="property.value">
+          </div>
         </div>
       </div>
+      <button @click="addUnit">Add unit +</button>
+      <hr>
     </div>
-    <hr />
-    <div>
-      <h2>Test</h2>
+    <!-- Armies -->
+    <div class="armies">
+      <div v-for="(army, index) in armies" :key="index" class="army">
+        <h3>Army {{index+1}}</h3>
+        <div v-for="(unitBundle, index) in army" :key="index">
+          <select v-model="unitBundle.unitType">
+            <option value=""></option>
+            <option v-for="(unit, index) in units" :key="index" :value="unit.name">{{ unit.name }}</option>
+          </select>
+          <input type="number" placeholder="amount" v-model="unitBundle.amount">
+        </div>
+        <button @click="addBundle(index)">Add +</button>
+        <div class="armyData">
+          <div v-for="(unitBundle, index) in army" :key="index">
+            <h4>{{ unitBundle.unitType }}</h4>
+            <span v-if="unitBundle.totalHP">HP: {{unitBundle.totalHP}} </span>
+            <span v-if="unitBundle.totalAttack">Attack: {{unitBundle.totalAttack}}</span>
+          </div>
+        </div>
+      </div>
+      <hr>
     </div>
+    <button @click="generateSimulation()">Generate</button>
   </div>
 </template>
 
 <script>
+import units from "../mocked-data/units";
+
 export default {
   name: "combatSimulation",
   components: {},
-  data() {
-    return {
-      units: [
-        {
-          name: "Mage",
-          properties: {
-            attack: {
-              name: "Attack",
-              content: 10
-            },
-            health: {
-              name: "HP",
-              content: 5
-            },
-            specialLevel: {
-              name: "Special",
-              content: 0
+  data() { return { 
+    units,
+    armies$: [
+      [
+        { unitType: '', amount: ''},
+        { unitType: '', amount: ''}
+      ],
+      [
+        { unitType: '', amount: ''},
+        { unitType: '', amount: ''}
+      ]
+    ]
+  }; },
+  computed: {
+    armies: {
+      get() {
+        this.armies$.forEach(army => {
+          army.map(unitsBundle => {
+            let outputBundle = unitsBundle;
+            outputBundle.unit = units.find((unit) => unit.name === unitsBundle.unitType);
+
+            if (outputBundle.unit) {
+              outputBundle.totalHP = 
+                outputBundle.unit.properties.health.value *
+                outputBundle.amount;
+
+              outputBundle.totalAttack = 
+                outputBundle.unit.properties.attack.value *
+                outputBundle.amount;
+            } else {
+              outputBundle.totalHP = 0;
+              outputBundle.totalAttack = 0;
             }
-          }
-        },
-        {
-          name: "Monk",
-          properties: {
-            attack: {
-              name: "Attack",
-              content: 5
-            },
-            health: {
-              name: "HP",
-              content: 20
-            },
-            physicalDefense: {
-              name: "Armor",
-              content: 0
-            },
-            magicalDefense: {
-              name: "Magic Resist",
-              content: 0
-            }
+            return outputBundle;
+          })
+        });
+        
+        return this.armies$;
+      }
+    }
+  },
+  methods: {
+    generateSimulation() {
+      
+    },
+    addBundle(index) {
+      this.armies[index].push({ unitType: '', amount: ''})
+    },
+    addUnit() {
+      this.units.push({
+        name: '',
+        properties: {
+          attack: {
+            name: 'Attack',
+            value: 0
+          },
+          health: {
+            name: 'HP',
+            value: 0
+          },
+          physicalDefense: {
+            name: 'Armor',
+            value: 0
+          },
+          magicalDefense: {
+            name: 'Magic Resist',
+            value: 0
+          },
+          specialLevel: {
+            name: 'Special',
+            value: 0
+          },
+          attackOrder: { 
+            name: 'Attack order',
+            value: 0
           }
         }
-      ]
-    };
+      })
+    }
   }
 };
 </script>
@@ -87,6 +147,25 @@ export default {
   }
   h3 {
     font-size: 1.5rem;
+  }
+
+  input {
+    text-align: left;
+    font-family: inherit;
+    font-size: inherit;
+    border: none;
+    border-bottom: 1px solid black;
+    background-color: inherit;
+    margin: 0 1rem;
+    width: auto;
+
+    &:focus {
+      outline: none;
+    }
+  }
+  h3 input {
+    max-width: 10rem;
+    text-align: center;
   }
 
   .unit {
@@ -121,24 +200,8 @@ export default {
     }
 
     input {
-      text-align: left;
-      font-family: inherit;
-      font-size: inherit;
-      border: none;
-      border-bottom: 1px solid black;
-      background-color: inherit;
-      margin: 0 1rem;
-      width: auto;
       min-width: 2rem;
       max-width: 4rem;
-
-      &:focus {
-        outline: none;
-      }
-    }
-    h3 input {
-      max-width: 10rem;
-      text-align: center;
     }
 
     .properties {
