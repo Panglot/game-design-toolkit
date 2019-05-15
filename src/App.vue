@@ -30,4 +30,22 @@ nav {
     }
   }
 }
+.vue-logo {
+    filter: drop-shadow(8px 8px 10px gray) sepia(30%) opacity(90%);
+}
+
+@keyframes float {
+	0% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		transform: translatey(0px);
+	}
+	50% {
+		box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
+		transform: translatey(-3rem);
+	}
+	100% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		transform: translatey(0px);
+	}
+}
 </style>

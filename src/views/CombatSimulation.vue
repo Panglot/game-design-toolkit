@@ -45,6 +45,8 @@
       <hr>
     </div>
     <button @click="generateSimulation()">Generate</button>
+
+    <div>{{ combats }}</div>
   </div>
 </template>
 
@@ -64,9 +66,12 @@ export default {
       [
         { unitType: '', amount: ''},
         { unitType: '', amount: ''}
-      ]
-    ]
+      ],
+    ],
+    combats: []
   }; },
+  beforeMount() {
+  },
   computed: {
     armies: {
       get() {
@@ -97,6 +102,34 @@ export default {
   },
   methods: {
     generateSimulation() {
+      let combat = { 
+        status: 'impossible',
+        army1: { attackOrder: []},
+        army2: { attackOrder: []}  
+      };
+      let armyStatus = [
+        { hasHealth: false, hasAttack: false },
+        { hasHealth: false, hasAttack: false }
+      ];
+
+      this.armies[0].forEach((unitBundle) => {
+        if (!armyStatus[0].hasHealth) armyStatus[0].hasHealth = unitBundle.totalHP ? true : false;
+        if (!armyStatus[0].hasAttack) armyStatus[0].hasAttack = unitBundle.totalAttack ? true : false;
+
+        if (unitBundle.unit) combat.army2.attackOrder.push(unitBundle.unit.properties.attackOrder.value);
+      })
+      this.armies[1].forEach((unitBundle) => {
+        if (!armyStatus[1].hasHealth) armyStatus[1].hasHealth = unitBundle.totalHP ? true : false;
+        if (!armyStatus[1].hasAttack) armyStatus[1].hasAttack = unitBundle.totalAttack ? true : false; 
+
+        if (unitBundle.unit) combat.army2.attackOrder.push(unitBundle.unit.properties.attackOrder.value);
+      })
+
+
+      combat.army1.attackOrder.sort();
+      combat.army2.attackOrder.sort();
+      
+      this.combats.push(combat);
       
     },
     addUnitBundle(index) { this.armies[index].push({ unitType: '', amount: ''}) },
@@ -168,10 +201,7 @@ export default {
       outline: none;
     }
   }
-  h3 input {
-    max-width: 10rem;
-    text-align: center;
-  }
+
 
   .unit {
     display: inline-block;
@@ -207,6 +237,11 @@ export default {
     input {
       min-width: 2rem;
       max-width: 4rem;
+    }  
+    
+    h3 input {
+    max-width: 10rem;
+    text-align: center;
     }
 
     .properties {
