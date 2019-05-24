@@ -18,9 +18,10 @@
       <button @click="addUnit()">Add unit +</button>
       <hr>
     </div>
+
     <!-- Armies -->
     <div class="armies">
-      <div v-for="(army, armyIndex) in armies" :key="armyIndex" class="army">
+      <div v-for="(army, armyIndex) in armiesOld" :key="armyIndex" class="army">
         <h3>Army {{ armyIndex+1 }}</h3>
 
         <div v-for="(unitBundle, unitBundleIndex) in army" :key="unitBundleIndex">
@@ -44,6 +45,8 @@
       </div>
       <hr>
     </div>
+
+    <!-- Other -->
     <button @click="generateSimulation()">Generate</button>
 
     <div>{{ combats }}</div>
@@ -52,8 +55,12 @@
 </template>
 
 <script>
-import unitsOld from '../../mocked-data/units';
+// store imports
+import combatSimulationModule from './store/index';
 import { mapActions, mapGetters } from 'vuex';
+
+// other imports
+import unitsSaved from '../../mocked-data/units';
 
 export default {
   name: 'combatSimulation',
@@ -67,17 +74,27 @@ export default {
       combats: []
     };
   },
+  // Init the store module
   created() {
-    unitsOld.forEach((unit) => { this.addUnit(unit) })
+    const store = this.$store;
+
+    if (!(store && store.state && store.state['combatSimulation'])) {
+      this.$store.registerModule('combatSimulation', combatSimulationModule);
+      unitsSaved.forEach((unit) => { this.addUnit(unit) });
+    } 
   },
   computed: {
-    ...mapGetters([ 'units' ]),
-    armies: {
+    ...mapGetters([ 
+      'units',
+      'armies'
+     ]),
+
+    armiesOld: {
       get() {
         this.armies$.forEach(army => {
           army.map(unitsBundle => {
             let outputBundle = unitsBundle;
-            outputBundle.unit = unitsOld.find(
+            outputBundle.unit = this.units.list.find(
               unit => unit.name === unitsBundle.unitType
             );
 
@@ -104,84 +121,50 @@ export default {
       'addUnit',
       'removeUnit'
     ]),
-    generateSimulation() {
-      let combat = {
-        status: 'impossible',
-        army1: { attackOrder: [] },
-        army2: { attackOrder: [] }
-      };
-      let armyStatus = [
-        { hasHealth: false, hasAttack: false },
-        { hasHealth: false, hasAttack: false }
-      ];
+    // generateSimulation() {
+    //   let combat = {
+    //     status: 'impossible',
+    //     army1: { attackOrder: [] },
+    //     army2: { attackOrder: [] }
+    //   };
+    //   let armyStatus = [
+    //     { hasHealth: false, hasAttack: false },
+    //     { hasHealth: false, hasAttack: false }
+    //   ];
 
-      this.armies[0].forEach(unitBundle => {
-        if (!armyStatus[0].hasHealth)
-          armyStatus[0].hasHealth = unitBundle.totalHP ? true : false;
-        if (!armyStatus[0].hasAttack)
-          armyStatus[0].hasAttack = unitBundle.totalAttack ? true : false;
+    //   this.armies[0].forEach(unitBundle => {
+    //     if (!armyStatus[0].hasHealth)
+    //       armyStatus[0].hasHealth = unitBundle.totalHP ? true : false;
+    //     if (!armyStatus[0].hasAttack)
+    //       armyStatus[0].hasAttack = unitBundle.totalAttack ? true : false;
 
-        if (unitBundle.unit)
-          combat.army2.attackOrder.push(
-            unitBundle.unit.properties.attackOrder.value
-          );
-      });
-      this.armies[1].forEach(unitBundle => {
-        if (!armyStatus[1].hasHealth)
-          armyStatus[1].hasHealth = unitBundle.totalHP ? true : false;
-        if (!armyStatus[1].hasAttack)
-          armyStatus[1].hasAttack = unitBundle.totalAttack ? true : false;
+    //     if (unitBundle.unit)
+    //       combat.army2.attackOrder.push(
+    //         unitBundle.unit.properties.attackOrder.value
+    //       );
+    //   });
+    //   this.armies[1].forEach(unitBundle => {
+    //     if (!armyStatus[1].hasHealth)
+    //       armyStatus[1].hasHealth = unitBundle.totalHP ? true : false;
+    //     if (!armyStatus[1].hasAttack)
+    //       armyStatus[1].hasAttack = unitBundle.totalAttack ? true : false;
 
-        if (unitBundle.unit)
-          combat.army2.attackOrder.push(
-            unitBundle.unit.properties.attackOrder.value
-          );
-      });
+    //     if (unitBundle.unit)
+    //       combat.army2.attackOrder.push(
+    //         unitBundle.unit.properties.attackOrder.value
+    //       );
+    //   });
 
-      combat.army1.attackOrder.sort();
-      combat.army2.attackOrder.sort();
+    //   combat.army1.attackOrder.sort();
+    //   combat.army2.attackOrder.sort();
 
-      this.combats.push(combat);
-    },
+    //   this.combats.push(combat);
+    // },
     addUnitBundle(index) {
       this.armies[index].push({ unitType: '', amount: '' });
     },
     removeUnitBundle(armyIndex, unitBundleIndex) {
       this.armies[armyIndex].splice(unitBundleIndex, 1);
-    },
-    addUnitOld() {
-      this.unitsOld.push({
-        name: '',
-        properties: {
-          attack: {
-            name: 'Attack',
-            value: 0
-          },
-          health: {
-            name: 'HP',
-            value: 0
-          },
-          physicalDefense: {
-            name: 'Armor',
-            value: 0
-          },
-          magicalDefense: {
-            name: 'Magic Resist',
-            value: 0
-          },
-          specialLevel: {
-            name: 'Special',
-            value: 0
-          },
-          attackOrder: {
-            name: 'Attack order',
-            value: 0
-          }
-        }
-      });
-    },
-    removeUnitOld(index) {
-      this.unitsOld.splice(index, 1);
     }
   }
 };
