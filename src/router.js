@@ -17,7 +17,7 @@ export default new Router({
       path: '/combat-simulation',
       name: 'combat-simulation',
       component: () =>
-        import('./views/CombatSimulation.vue')
+        import('./views/combat-simulation/CombatSimulation.vue')
     },
     {
       path: '/vue-info-page',

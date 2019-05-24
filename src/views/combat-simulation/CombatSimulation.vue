@@ -3,7 +3,7 @@
     <h1>Simulation</h1>
     <!-- Units -->
     <div class="units">
-      <div v-for="(unit, index) in units" :key="index" class="unit">
+      <div v-for="(unit, index) in units.list" :key="index" class="unit">
         <h3>
           <input type="text" v-model="unit.name">
         </h3>
@@ -15,30 +15,30 @@
         </div>
         <button @click="removeUnit(index)">x</button>
       </div>
-      <button @click="addUnit">Add unit +</button>
+      <button @click="addUnit()">Add unit +</button>
       <hr>
     </div>
     <!-- Armies -->
     <div class="armies">
       <div v-for="(army, armyIndex) in armies" :key="armyIndex" class="army">
-        <h3>Army {{armyIndex+1}}</h3>
+        <h3>Army {{ armyIndex+1 }}</h3>
 
         <div v-for="(unitBundle, unitBundleIndex) in army" :key="unitBundleIndex">
           <select v-model="unitBundle.unitType">
-            <option value=""></option>
+            <option value></option>
             <option v-for="(unit, index) in units" :key="index" :value="unit.name">{{ unit.name }}</option>
           </select>
           <input type="number" placeholder="amount" v-model="unitBundle.amount">
           <button @click="removeUnitBundle(armyIndex, unitBundleIndex)">x</button>
         </div>
-        
+
         <button @click="addUnitBundle(armyIndex)">Add +</button>
 
         <div class="armyData">
           <div v-for="(unitBundle, index) in army" :key="index">
             <h4>{{ unitBundle.unitType }}</h4>
-            <span v-if="unitBundle.totalHP">HP: {{unitBundle.totalHP}} </span>
-            <span v-if="unitBundle.totalAttack">Attack: {{unitBundle.totalAttack}}</span>
+            <span v-if="unitBundle.totalHP">HP: {{ unitBundle.totalHP }}</span>
+            <span v-if="unitBundle.totalAttack">Attack: {{ unitBundle.totalAttack }}</span>
           </div>
         </div>
       </div>
@@ -47,95 +47,110 @@
     <button @click="generateSimulation()">Generate</button>
 
     <div>{{ combats }}</div>
+    <button @click="addUnit()"> Е ТУК Е ТЪЙ</button>
   </div>
 </template>
 
 <script>
-import units from "../mocked-data/units";
+import unitsOld from '../../mocked-data/units';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
-  name: "combatSimulation",
+  name: 'combatSimulation',
   components: {},
-  data() { return { 
-    units,
-    armies$: [
-      [
-        { unitType: '', amount: ''},
-        { unitType: '', amount: ''}
+  data() {
+    return {
+      armies$: [
+        [{ unitType: '', amount: '' }, { unitType: '', amount: '' }],
+        [{ unitType: '', amount: '' }, { unitType: '', amount: '' }]
       ],
-      [
-        { unitType: '', amount: ''},
-        { unitType: '', amount: ''}
-      ],
-    ],
-    combats: []
-  }; },
-  beforeMount() {
+      combats: []
+    };
+  },
+  created() {
+    unitsOld.forEach((unit) => { this.addUnit(unit) })
   },
   computed: {
+    ...mapGetters([ 'units' ]),
     armies: {
       get() {
         this.armies$.forEach(army => {
           army.map(unitsBundle => {
             let outputBundle = unitsBundle;
-            outputBundle.unit = units.find((unit) => unit.name === unitsBundle.unitType);
+            outputBundle.unit = unitsOld.find(
+              unit => unit.name === unitsBundle.unitType
+            );
 
             if (outputBundle.unit) {
-              outputBundle.totalHP = 
-                outputBundle.unit.properties.health.value *
-                outputBundle.amount;
+              outputBundle.totalHP =
+                outputBundle.unit.properties.health.value * outputBundle.amount;
 
-              outputBundle.totalAttack = 
-                outputBundle.unit.properties.attack.value *
-                outputBundle.amount;
+              outputBundle.totalAttack =
+                outputBundle.unit.properties.attack.value * outputBundle.amount;
             } else {
               outputBundle.totalHP = 0;
               outputBundle.totalAttack = 0;
             }
             return outputBundle;
-          })
+          });
         });
-        
+
         return this.armies$;
       }
     }
   },
   methods: {
+    ...mapActions([
+      'addUnit',
+      'removeUnit'
+    ]),
     generateSimulation() {
-      let combat = { 
+      let combat = {
         status: 'impossible',
-        army1: { attackOrder: []},
-        army2: { attackOrder: []}  
+        army1: { attackOrder: [] },
+        army2: { attackOrder: [] }
       };
       let armyStatus = [
         { hasHealth: false, hasAttack: false },
         { hasHealth: false, hasAttack: false }
       ];
 
-      this.armies[0].forEach((unitBundle) => {
-        if (!armyStatus[0].hasHealth) armyStatus[0].hasHealth = unitBundle.totalHP ? true : false;
-        if (!armyStatus[0].hasAttack) armyStatus[0].hasAttack = unitBundle.totalAttack ? true : false;
+      this.armies[0].forEach(unitBundle => {
+        if (!armyStatus[0].hasHealth)
+          armyStatus[0].hasHealth = unitBundle.totalHP ? true : false;
+        if (!armyStatus[0].hasAttack)
+          armyStatus[0].hasAttack = unitBundle.totalAttack ? true : false;
 
-        if (unitBundle.unit) combat.army2.attackOrder.push(unitBundle.unit.properties.attackOrder.value);
-      })
-      this.armies[1].forEach((unitBundle) => {
-        if (!armyStatus[1].hasHealth) armyStatus[1].hasHealth = unitBundle.totalHP ? true : false;
-        if (!armyStatus[1].hasAttack) armyStatus[1].hasAttack = unitBundle.totalAttack ? true : false; 
+        if (unitBundle.unit)
+          combat.army2.attackOrder.push(
+            unitBundle.unit.properties.attackOrder.value
+          );
+      });
+      this.armies[1].forEach(unitBundle => {
+        if (!armyStatus[1].hasHealth)
+          armyStatus[1].hasHealth = unitBundle.totalHP ? true : false;
+        if (!armyStatus[1].hasAttack)
+          armyStatus[1].hasAttack = unitBundle.totalAttack ? true : false;
 
-        if (unitBundle.unit) combat.army2.attackOrder.push(unitBundle.unit.properties.attackOrder.value);
-      })
-
+        if (unitBundle.unit)
+          combat.army2.attackOrder.push(
+            unitBundle.unit.properties.attackOrder.value
+          );
+      });
 
       combat.army1.attackOrder.sort();
       combat.army2.attackOrder.sort();
-      
+
       this.combats.push(combat);
-      
     },
-    addUnitBundle(index) { this.armies[index].push({ unitType: '', amount: ''}) },
-    removeUnitBundle(armyIndex, unitBundleIndex) {  this.armies[armyIndex].splice(unitBundleIndex, 1); },
-    addUnit() {
-      this.units.push({
+    addUnitBundle(index) {
+      this.armies[index].push({ unitType: '', amount: '' });
+    },
+    removeUnitBundle(armyIndex, unitBundleIndex) {
+      this.armies[armyIndex].splice(unitBundleIndex, 1);
+    },
+    addUnitOld() {
+      this.unitsOld.push({
         name: '',
         properties: {
           attack: {
@@ -158,14 +173,16 @@ export default {
             name: 'Special',
             value: 0
           },
-          attackOrder: { 
+          attackOrder: {
             name: 'Attack order',
             value: 0
           }
         }
-      })
+      });
     },
-    removeUnit(index) { this.units.splice(index, 1); }
+    removeUnitOld(index) {
+      this.unitsOld.splice(index, 1);
+    }
   }
 };
 </script>
@@ -178,7 +195,7 @@ export default {
   h2,
   h3 {
     text-align: center;
-    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   }
   h1 {
     font-size: 2.4rem;
@@ -201,7 +218,6 @@ export default {
       outline: none;
     }
   }
-
 
   .unit {
     display: inline-block;
@@ -237,11 +253,11 @@ export default {
     input {
       min-width: 2rem;
       max-width: 4rem;
-    }  
-    
+    }
+
     h3 input {
-    max-width: 10rem;
-    text-align: center;
+      max-width: 10rem;
+      text-align: center;
     }
 
     .properties {
