@@ -6,7 +6,13 @@ export default {
       state.units.list.push(unit);
     }
   },
+
   removeUnit(state, index) {
     state.units.list.splice(index, 1);
+  },
+
+  addUnitBundle(state, armyKey, bundle) {
+    
+    state.armies[armyKey].unitBundles.push(bundle)
   }
 }

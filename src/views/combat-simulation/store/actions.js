@@ -1,9 +1,10 @@
 import unitTemplate from '../../../mocked-data/combat-simulation/unit-template';
+import unitBundleTemplate from '../../../mocked-data/combat-simulation/unit-bundle-template';
 
 export default {
   addUnit(context, unit = null) {
     if (!unit) { unit = unitTemplate; }
-    
+
     context.commit('addUnit', unit);
   },
 
@@ -13,5 +14,15 @@ export default {
     } else { 
       context.commit('removeUnit', index); 
     }
-  } 
+  },
+
+  addUnitBundle(context, armyKey, bundle = null) {
+    if(!armyKey) { 
+      console.error('addUnitBundle: ArmyKey must be provided') 
+    } else {
+      if(!bundle) { bundle = unitBundleTemplate }
+      
+      context.commit('addUnitBundle', armyKey, bundle)
+    }
+  }
 }

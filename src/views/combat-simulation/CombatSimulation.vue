@@ -27,13 +27,13 @@
         <div v-for="(unitBundle, unitBundleIndex) in army" :key="unitBundleIndex">
           <select v-model="unitBundle.unitType">
             <option value></option>
-            <option v-for="(unit, index) in units" :key="index" :value="unit.name">{{ unit.name }}</option>
+            <option v-for="(unit, index) in units.list" :key="index" :value="unit.name">{{ unit.name }}</option>
           </select>
           <input type="number" placeholder="amount" v-model="unitBundle.amount">
           <button @click="removeUnitBundle(armyIndex, unitBundleIndex)">x</button>
         </div>
 
-        <button @click="addUnitBundle(armyIndex)">Add +</button>
+        <!-- <button @click="addUnitBundle(armyIndex)">Add +</button> -->
 
         <div class="armyData">
           <div v-for="(unitBundle, index) in army" :key="index">
@@ -67,6 +67,9 @@ export default {
   components: {},
   data() {
     return {
+      CONSTANTS: {
+        STARTING_BUNDLES: 2
+      },
       armies$: [
         [{ unitType: '', amount: '' }, { unitType: '', amount: '' }],
         [{ unitType: '', amount: '' }, { unitType: '', amount: '' }]
@@ -80,7 +83,7 @@ export default {
 
     if (!(store && store.state && store.state['combatSimulation'])) {
       this.$store.registerModule('combatSimulation', combatSimulationModule);
-      unitsSaved.forEach((unit) => { this.addUnit(unit) });
+      // this.initStoreData();
     } 
   },
   computed: {
@@ -119,8 +122,17 @@ export default {
   methods: {
     ...mapActions([
       'addUnit',
-      'removeUnit'
+      'removeUnit',
+      'addUnitBundle'
     ]),
+    
+    initStoreData() {
+      unitsSaved.forEach((unit) => { this.addUnit(unit) });
+
+      Object.keys(this.armies).forEach((army) => {
+        for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES; i++) { this.addUnitBundle(army); }
+      })
+    },
     // generateSimulation() {
     //   let combat = {
     //     status: 'impossible',
@@ -160,9 +172,9 @@ export default {
 
     //   this.combats.push(combat);
     // },
-    addUnitBundle(index) {
-      this.armies[index].push({ unitType: '', amount: '' });
-    },
+    // addUnitBundle(index) {
+    //   this.armies[index].push({ unitType: '', amount: '' });
+    // },
     removeUnitBundle(armyIndex, unitBundleIndex) {
       this.armies[armyIndex].splice(unitBundleIndex, 1);
     }

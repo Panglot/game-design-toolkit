@@ -3,7 +3,13 @@ export default {
     list: []
   },
   armies: {
-    playerArmy: {},
-    enemyArmy: {}
+    playerArmy: {
+      turnOrder: [],
+      unitBundles: []
+    },
+    enemyArmy: {
+      turnOrder: [],
+      unitBundles: []
+    }
   }
 }
