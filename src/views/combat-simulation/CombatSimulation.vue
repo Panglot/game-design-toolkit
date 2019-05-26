@@ -19,29 +19,33 @@
       <hr>
     </div>
 
+    <!-- <div v-for="(army, armyIndex) in armies" :key="armyIndex">
+      {{ army }} {{ armyIndex }}
+    </div> -->
+
     <!-- Armies -->
     <div class="armies">
-      <div v-for="(army, armyIndex) in armiesOld" :key="armyIndex" class="army">
-        <h3>Army {{ armyIndex+1 }}</h3>
+      <div v-for="(army, armyKey) in armies" :key="armyKey" class="army">
+        <h3>{{ armyKey }}</h3>
 
-        <div v-for="(unitBundle, unitBundleIndex) in army" :key="unitBundleIndex">
+        <div v-for="(unitBundle, unitBundleIndex) in army.unitBundles" :key="unitBundleIndex">
           <select v-model="unitBundle.unitType">
             <option value></option>
             <option v-for="(unit, index) in units.list" :key="index" :value="unit.name">{{ unit.name }}</option>
           </select>
           <input type="number" placeholder="amount" v-model="unitBundle.amount">
-          <button @click="removeUnitBundle(armyIndex, unitBundleIndex)">x</button>
+          <!-- <button @click="removeUnitBundle(armyIndex, unitBundleIndex)">x</button> -->
         </div>
 
         <!-- <button @click="addUnitBundle(armyIndex)">Add +</button> -->
 
-        <div class="armyData">
+        <!-- <div class="armyData">
           <div v-for="(unitBundle, index) in army" :key="index">
             <h4>{{ unitBundle.unitType }}</h4>
             <span v-if="unitBundle.totalHP">HP: {{ unitBundle.totalHP }}</span>
             <span v-if="unitBundle.totalAttack">Attack: {{ unitBundle.totalAttack }}</span>
           </div>
-        </div>
+        </div> -->
       </div>
       <hr>
     </div>
@@ -83,7 +87,7 @@ export default {
 
     if (!(store && store.state && store.state['combatSimulation'])) {
       this.$store.registerModule('combatSimulation', combatSimulationModule);
-      // this.initStoreData();
+      this.initStoreData();
     } 
   },
   computed: {
@@ -127,10 +131,10 @@ export default {
     ]),
     
     initStoreData() {
-      unitsSaved.forEach((unit) => { this.addUnit(unit) });
+      unitsSaved.forEach((unit) => { this.addUnit({ unit }) });
 
-      Object.keys(this.armies).forEach((army) => {
-        for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES; i++) { this.addUnitBundle(army); }
+      Object.keys(this.armies).forEach((armyKey) => {
+        for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES; i++) { this.addUnitBundle({ armyKey }); }
       })
     },
     // generateSimulation() {

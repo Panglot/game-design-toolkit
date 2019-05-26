@@ -1,18 +1,19 @@
 export default {
-  addUnit(state, unit) {
-    if (!unit) { 
-      console.error(`addUnit: Unit cannot be ${unit}`); 
+  addUnit(state, payload) {
+    if (!payload.unit) {
+      console.error(`addUnit: Unit cannot be ${payload.unit}`)
     } else {
-      state.units.list.push(unit);
+      state.units.list.push(payload.unit)
     }
   },
 
-  removeUnit(state, index) {
-    state.units.list.splice(index, 1);
+  removeUnit(state, payload) {
+    state.units.list.splice(payload.index, 1)
   },
 
-  addUnitBundle(state, armyKey, bundle) {
-    
-    state.armies[armyKey].unitBundles.push(bundle)
+  addUnitBundle(state, payload) {
+    console.log(payload)
+
+    state.armies[payload.armyKey].unitBundles.push(payload.bundle)
   }
 }
