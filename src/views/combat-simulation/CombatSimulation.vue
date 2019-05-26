@@ -13,15 +13,11 @@
             <input type="number" v-model="property.value">
           </div>
         </div>
-        <button @click="removeUnit(index)">x</button>
+        <button @click="unitRemove({ index })">x</button>
       </div>
-      <button @click="addUnit()">Add unit +</button>
+      <button @click="unitAdd()">Add unit +</button>
       <hr>
     </div>
-
-    <!-- <div v-for="(army, armyIndex) in armies" :key="armyIndex">
-      {{ army }} {{ armyIndex }}
-    </div> -->
 
     <!-- Armies -->
     <div class="armies">
@@ -29,32 +25,40 @@
         <h3>{{ armyKey }}</h3>
 
         <div v-for="(unitBundle, unitBundleIndex) in army.unitBundles" :key="unitBundleIndex">
-          <select v-model="unitBundle.unitType">
+          <select
+            @change="unitBundleUpdate({ 
+                armyKey,
+                unitBundleIndex,
+                update: { unitType: $event.target.value }
+            })">
             <option value></option>
             <option v-for="(unit, index) in units.list" :key="index" :value="unit.name">{{ unit.name }}</option>
           </select>
-          <input type="number" placeholder="amount" v-model="unitBundle.amount">
-          <!-- <button @click="removeUnitBundle(armyIndex, unitBundleIndex)">x</button> -->
+          <input 
+            type="number"
+            min="0"
+            placeholder="amount" 
+            @input="unitBundleUpdate({ 
+              armyKey,
+              unitBundleIndex,
+              update: { amount: $event.target.value }
+          })">
+          <button @click="unitBundleRemove({ armyKey, unitBundleIndex })">x</button>
         </div>
-
-        <!-- <button @click="addUnitBundle(armyIndex)">Add +</button> -->
-
-        <!-- <div class="armyData">
-          <div v-for="(unitBundle, index) in army" :key="index">
+        <button @click="unitBundleAdd({ armyKey })">Add +</button>
+        <div class="armyData">
+          <div v-for="(unitBundle, index) in army.unitBundles" :key="index"> 
             <h4>{{ unitBundle.unitType }}</h4>
-            <span v-if="unitBundle.totalHP">HP: {{ unitBundle.totalHP }}</span>
-            <span v-if="unitBundle.totalAttack">Attack: {{ unitBundle.totalAttack }}</span>
+            <span v-if="unitBundle.health">HP: {{ unitBundle.health }} </span>
+            <span v-if="unitBundle.attack">Attack: {{ unitBundle.attack }}</span>
           </div>
-        </div> -->
+        </div>
       </div>
       <hr>
     </div>
 
     <!-- Other -->
     <button @click="generateSimulation()">Generate</button>
-
-    <div>{{ combats }}</div>
-    <button @click="addUnit()"> Е ТУК Е ТЪЙ</button>
   </div>
 </template>
 
@@ -72,7 +76,7 @@ export default {
   data() {
     return {
       CONSTANTS: {
-        STARTING_BUNDLES: 2
+        STARTING_BUNDLES_COUNT: 2
       },
       armies$: [
         [{ unitType: '', amount: '' }, { unitType: '', amount: '' }],
@@ -81,12 +85,12 @@ export default {
       combats: []
     };
   },
-  // Init the store module
+  // Init the store with default data if not set
   created() {
     const store = this.$store;
 
     if (!(store && store.state && store.state['combatSimulation'])) {
-      this.$store.registerModule('combatSimulation', combatSimulationModule);
+      store.registerModule('combatSimulation', combatSimulationModule);
       this.initStoreData();
     } 
   },
@@ -95,46 +99,23 @@ export default {
       'units',
       'armies'
      ]),
-
-    armiesOld: {
-      get() {
-        this.armies$.forEach(army => {
-          army.map(unitsBundle => {
-            let outputBundle = unitsBundle;
-            outputBundle.unit = this.units.list.find(
-              unit => unit.name === unitsBundle.unitType
-            );
-
-            if (outputBundle.unit) {
-              outputBundle.totalHP =
-                outputBundle.unit.properties.health.value * outputBundle.amount;
-
-              outputBundle.totalAttack =
-                outputBundle.unit.properties.attack.value * outputBundle.amount;
-            } else {
-              outputBundle.totalHP = 0;
-              outputBundle.totalAttack = 0;
-            }
-            return outputBundle;
-          });
-        });
-
-        return this.armies$;
-      }
-    }
   },
   methods: {
     ...mapActions([
-      'addUnit',
-      'removeUnit',
-      'addUnitBundle'
+      'unitAdd',
+      'unitRemove',
+      'unitBundleAdd',
+      'unitBundleUpdate',
+      'unitBundleRemove'
     ]),
     
     initStoreData() {
-      unitsSaved.forEach((unit) => { this.addUnit({ unit }) });
+      unitsSaved.forEach((unit) => { this.unitAdd({ unit }) });
 
       Object.keys(this.armies).forEach((armyKey) => {
-        for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES; i++) { this.addUnitBundle({ armyKey }); }
+        for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES_COUNT; i++) { 
+          this.unitBundleAdd({ armyKey }); 
+        }
       })
     },
     // generateSimulation() {
@@ -175,13 +156,7 @@ export default {
     //   combat.army2.attackOrder.sort();
 
     //   this.combats.push(combat);
-    // },
-    // addUnitBundle(index) {
-    //   this.armies[index].push({ unitType: '', amount: '' });
-    // },
-    removeUnitBundle(armyIndex, unitBundleIndex) {
-      this.armies[armyIndex].splice(unitBundleIndex, 1);
-    }
+    // }
   }
 };
 </script>

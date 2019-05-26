@@ -1,19 +1,25 @@
 export default {
-  addUnit(state, payload) {
+  unitAdd(state, payload) {
     if (!payload.unit) {
-      console.error(`addUnit: Unit cannot be ${payload.unit}`)
+      console.error(`unitAdd: Unit cannot be ${payload.unit}`);
     } else {
-      state.units.list.push(payload.unit)
+      state.units.list.push(payload.unit);
     }
   },
 
-  removeUnit(state, payload) {
-    state.units.list.splice(payload.index, 1)
+  unitRemove(state, payload) {
+    state.units.list.splice(payload.index, 1);
   },
 
-  addUnitBundle(state, payload) {
-    console.log(payload)
+  unitBundleAdd(state, payload) {
+    state.armies[payload.armyKey].unitBundles.push(payload.bundle);
+  },
 
-    state.armies[payload.armyKey].unitBundles.push(payload.bundle)
+  unitBundleSet(state, payload) {
+    state.armies[payload.armyKey].unitBundles.splice(payload.unitBundleIndex, 1, payload.update);
+  },
+
+  unitBundleRemove(state, payload) {
+    state.armies[payload.armyKey].unitBundles.splice(payload.unitBundleIndex);
   }
 }

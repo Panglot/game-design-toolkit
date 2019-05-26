@@ -1,5 +1,5 @@
 export default {
-  bundleStatus: 'ignore',
+  status: 'ignore',
   unitType: '', 
   amount: '' 
-}
+};
