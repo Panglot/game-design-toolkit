@@ -1,3 +1,5 @@
+import { merge } from 'lodash';
+
 export default {
   unitAdd(state, payload) {
     if (!payload.unit) {
@@ -12,14 +14,33 @@ export default {
   },
 
   unitBundleAdd(state, payload) {
-    state.armies[payload.armyKey].unitBundles.push(payload.bundle);
+    payload.army.unitBundles.push(payload.bundle);
   },
 
-  unitBundleSet(state, payload) {
-    state.armies[payload.armyKey].unitBundles.splice(payload.unitBundleIndex, 1, payload.update);
+  unitBundleUpdate(state, payload) {
+    const bundle = payload.unitBundle;
+    merge(bundle, payload.update);
+    
+    if (payload.update.unitType) {
+      bundle.unit = state.units.list.find((unit) => {
+        return unit.name === payload.update.unitType;
+      });
+    }
+
+    console.log(bundle);
+    
+    if (!(bundle.unitType && parseInt(bundle.amount))) {
+      bundle.health = null;
+      bundle.attack = null;
+      bundle.status = 'ignore';
+    } else {
+      bundle.health = bundle.unit.properties.health.value * bundle.amount;
+      bundle.attack = bundle.unit.properties.attack.value * bundle.amount;
+      bundle.status = 'active';
+    };
   },
 
   unitBundleRemove(state, payload) {
-    state.armies[payload.armyKey].unitBundles.splice(payload.unitBundleIndex);
+    payload.army.unitBundles.splice(payload.unitBundleIndex);
   }
 }

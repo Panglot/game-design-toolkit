@@ -26,9 +26,8 @@
 
         <div v-for="(unitBundle, unitBundleIndex) in army.unitBundles" :key="unitBundleIndex">
           <select
-            @change="unitBundleUpdate({ 
-                armyKey,
-                unitBundleIndex,
+            @change="unitBundleUpdate({
+                unitBundle,
                 update: { unitType: $event.target.value }
             })">
             <option value></option>
@@ -39,13 +38,12 @@
             min="0"
             placeholder="amount" 
             @input="unitBundleUpdate({ 
-              armyKey,
-              unitBundleIndex,
+              unitBundle,
               update: { amount: $event.target.value }
           })">
-          <button @click="unitBundleRemove({ armyKey, unitBundleIndex })">x</button>
+          <button @click="unitBundleRemove({ army, unitBundleIndex })">x</button>
         </div>
-        <button @click="unitBundleAdd({ armyKey })">Add +</button>
+        <button @click="unitBundleAdd({ army })">Add +</button>
         <div class="armyData">
           <div v-for="(unitBundle, index) in army.unitBundles" :key="index"> 
             <h4>{{ unitBundle.unitType }}</h4>
@@ -77,12 +75,7 @@ export default {
     return {
       CONSTANTS: {
         STARTING_BUNDLES_COUNT: 2
-      },
-      armies$: [
-        [{ unitType: '', amount: '' }, { unitType: '', amount: '' }],
-        [{ unitType: '', amount: '' }, { unitType: '', amount: '' }]
-      ],
-      combats: []
+      }
     };
   },
   // Init the store with default data if not set
@@ -112,11 +105,11 @@ export default {
     initStoreData() {
       unitsSaved.forEach((unit) => { this.unitAdd({ unit }) });
 
-      Object.keys(this.armies).forEach((armyKey) => {
-        for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES_COUNT; i++) { 
-          this.unitBundleAdd({ armyKey }); 
-        }
-      })
+      // Object.keys(this.armies).forEach((armyKey) => {
+      //   for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES_COUNT; i++) { 
+      //     this.unitBundleAdd({ armyKey }); 
+      //   }
+      // })
     },
     // generateSimulation() {
     //   let combat = {

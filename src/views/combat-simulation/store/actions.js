@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import { merge, cloneDeep } from 'lodash';
 
 import unitTemplate from '../../../mocked-data/combat-simulation/unit-template';
 import unitBundleTemplate from '../../../mocked-data/combat-simulation/unit-bundle-template';
@@ -19,47 +19,26 @@ export default {
   },
 
   unitBundleAdd({ commit }, payload = {}) {
-    if (!payload.armyKey) { 
+    if (!payload.army) { 
       console.error('unitBundleAdd: ArmyKey must be provided') ;
     } else {
-      if (!payload.bundle) { payload.bundle = unitBundleTemplate }
+      if (!payload.bundle) { payload.bundle = cloneDeep(unitBundleTemplate) }
       
       commit('unitBundleAdd', payload);
     }
   },
 
   unitBundleUpdate({ commit, dispatch, state }, payload = {}) {
-    if (!(payload.armyKey && (payload.unitBundleIndex !== undefined))) { 
-      console.error('unitBundleUpdate: Both armyKey and unitBundleIndex must be provided.');
+    if (!payload.unitBundle) { 
+      console.error('unitBundleUpdate: unitBundle must be provided.');
     } else  {
-      const bundle = JSON.parse(JSON.stringify(state.armies[payload.armyKey].unitBundles[payload.unitBundleIndex]));
-      merge(bundle, payload.update);
-      
-      if (payload.update.unitType) {
-        bundle.unit = state.units.list.find((unit) => {
-          return unit.name === payload.update.unitType;
-        });
-      }
-
-      if (!(bundle.unitType && parseInt(bundle.amount))) {
-        bundle.health = null;
-        bundle.attack = null;
-        bundle.status = 'ignore';
-      } else {
-        bundle.health = bundle.unit.properties.health.value * bundle.amount;
-        bundle.attack = bundle.unit.properties.attack.value * bundle.amount;
-        bundle.status = 'active';
-      }
-
-      payload.update = bundle;
-      commit('unitBundleSet', payload); 
-      dispatch('armyReevaluate', { armyKey: payload.armyKey});
+      commit('unitBundleUpdate', payload); 
     }
   },
 
   unitBundleRemove({ commit }, payload = {}) {
-    if (!(payload.armyKey && (payload.unitBundleIndex !== undefined))) { 
-      console.error('unitBundleUpdate: Both armyKey and unitBundleIndex must be provided.');
+    if (!(payload.army && (payload.unitBundleIndex !== undefined))) { 
+      console.error('unitBundleUpdate: Both army and unitBundleIndex must be provided.');
     } else  {
       commit('unitBundleRemove', payload);
     }
@@ -67,7 +46,7 @@ export default {
 
   armyReevaluate({ commit, state }, payload = {}) {
     if (!payload.armyKey) {
-      console.error('armyReevaluate: ArmyKey is required.');
+      console.error('armyReevaluate: army is required.');
     } else {
       // Logic for update. attacOrder, status and etc.
     }
