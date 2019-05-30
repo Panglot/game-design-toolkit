@@ -1,5 +1,8 @@
 export default {
   status: 'ignore',
   unitType: '', 
-  amount: '' 
+  amount: '',
+  unit: null,
+  health: null,
+  attack: null
 };

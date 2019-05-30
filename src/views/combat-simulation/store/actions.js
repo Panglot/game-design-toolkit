@@ -9,16 +9,22 @@ export default {
 
     commit('unitAdd', payload);
   },
-
-  unitRemove({ commit }, payload = {}) {
-    if (!payload.index) {
-      console.error('unitRemove: Index is required.');
+  unitRemove({ commit }, payload) {
+    if (!payload.unitIndex) {
+      console.error('unitRemove: unitIndex is required.');
     } else {
       commit('unitRemove', payload);
     }
   },
+  unitUpdate({ commit }, payload) {
+    if (!payload.unit) {
+      console.error('unitUpdate: unit must be provided.');
+    } else {
+      commit('unitUpdate', payload)
+    }    
+  },
 
-  unitBundleAdd({ commit }, payload = {}) {
+  unitBundleAdd({ commit }, payload) {
     if (!payload.army) { 
       console.error('unitBundleAdd: ArmyKey must be provided') ;
     } else {
@@ -27,8 +33,14 @@ export default {
       commit('unitBundleAdd', payload);
     }
   },
-
-  unitBundleUpdate({ commit, dispatch, state }, payload = {}) {
+  unitBundleRemove({ commit }, payload) {
+    if (!(payload.army && (payload.unitBundleIndex !== undefined))) { 
+      console.error('unitBundleUpdate: Both army and unitBundleIndex must be provided.');
+    } else  {
+      commit('unitBundleRemove', payload);
+    }
+  },
+  unitBundleUpdate({ commit, dispatch, state }, payload) {
     if (!payload.unitBundle) { 
       console.error('unitBundleUpdate: unitBundle must be provided.');
     } else  {
@@ -36,15 +48,7 @@ export default {
     }
   },
 
-  unitBundleRemove({ commit }, payload = {}) {
-    if (!(payload.army && (payload.unitBundleIndex !== undefined))) { 
-      console.error('unitBundleUpdate: Both army and unitBundleIndex must be provided.');
-    } else  {
-      commit('unitBundleRemove', payload);
-    }
-  },
-
-  armyReevaluate({ commit, state }, payload = {}) {
+  armyReevaluate({ commit, state }, payload) {
     if (!payload.armyKey) {
       console.error('armyReevaluate: army is required.');
     } else {

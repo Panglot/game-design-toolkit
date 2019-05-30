@@ -3,17 +3,33 @@
     <h1>Simulation</h1>
     <!-- Units -->
     <div class="units">
-      <div v-for="(unit, index) in units.list" :key="index" class="unit">
+      <div v-for="(unit, unitIndex) in units.list" :key="unitIndex" class="unit">
         <h3>
-          <input type="text" v-model="unit.name">
+          <input 
+            type="text"
+            :value="unit.name"
+            @input="unitUpdate({
+              unit,
+              update: { name: $event.target.value }
+          })">
         </h3>
         <div class="properties">
-          <div v-for="(property, index) in unit.properties" :key="index" class="property">
+          <div v-for="(property, propertyIndex) in unit.properties" :key="propertyIndex" class="property">
             <span>{{ property.name }}</span>
-            <input type="number" v-model="property.value">
+            <input 
+              type="number" 
+              :value="property.value"
+              @input="unitUpdate({
+                unit,
+                update: { 
+                  properties: { 
+                    [propertyIndex]: { value: $event.target.value }
+                  }
+                }
+            })">
           </div>
         </div>
-        <button @click="unitRemove({ index })">x</button>
+        <button @click="unitRemove({ unitIndex })">x</button>
       </div>
       <button @click="unitAdd()">Add unit +</button>
       <hr>
@@ -42,13 +58,14 @@
               update: { amount: $event.target.value }
           })">
           <button @click="unitBundleRemove({ army, unitBundleIndex })">x</button>
+          <button @click="unitBundleUpdate({ unitBundle })">⟳</button>
         </div>
         <button @click="unitBundleAdd({ army })">Add +</button>
         <div class="armyData">
           <div v-for="(unitBundle, index) in army.unitBundles" :key="index"> 
-            <h4>{{ unitBundle.unitType }}</h4>
-            <span v-if="unitBundle.health">HP: {{ unitBundle.health }} </span>
-            <span v-if="unitBundle.attack">Attack: {{ unitBundle.attack }}</span>
+            <h4 style="margin-bottom: .5rem; font-size: 1.4rem;">{{ unitBundle.unitType }}</h4>
+            <span v-if="unitBundle.health"><strong>HP:</strong>{{ unitBundle.health }}&nbsp;&nbsp;</span>
+            <span v-if="unitBundle.attack"><strong>Attack: </strong> {{ unitBundle.attack }}</span>
           </div>
         </div>
       </div>
@@ -97,19 +114,20 @@ export default {
     ...mapActions([
       'unitAdd',
       'unitRemove',
+      'unitUpdate',
       'unitBundleAdd',
-      'unitBundleUpdate',
-      'unitBundleRemove'
+      'unitBundleRemove',
+      'unitBundleUpdate'
     ]),
     
     initStoreData() {
       unitsSaved.forEach((unit) => { this.unitAdd({ unit }) });
 
-      // Object.keys(this.armies).forEach((armyKey) => {
-      //   for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES_COUNT; i++) { 
-      //     this.unitBundleAdd({ armyKey }); 
-      //   }
-      // })
+      Object.keys(this.armies).forEach((armyKey) => {
+        for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES_COUNT; i++) { 
+          this.unitBundleAdd({ army: this.armies[armyKey] }); 
+        }
+      })
     },
     // generateSimulation() {
     //   let combat = {
