@@ -35,6 +35,8 @@
       <hr>
     </div>
 
+    <button @click="generateRandomUnitSets()">Generate Units</button>
+
     <!-- Armies -->
     <div class="armies">
       <div v-for="(army, armyKey) in armies" :key="armyKey" class="army">
@@ -61,9 +63,11 @@
           <button @click="unitBundleUpdate({ unitBundle })">⟳</button>
         </div>
         <button @click="unitBundleAdd({ army })">Add +</button>
+
+        <!-- ArmyData  -->
         <div class="armyData">
           <div v-for="(unitBundle, index) in army.unitBundles" :key="index"> 
-            <h4 style="margin-bottom: .5rem; font-size: 1.4rem;">{{ unitBundle.unitType }}</h4>
+            <h4 style="margin-bottom: .5rem; font-size: 1.4rem;">{{unitBundle.amount}} {{ unitBundle.unitType }}s</h4>
             <span v-if="unitBundle.health"><strong>HP:</strong>{{ unitBundle.health }}&nbsp;&nbsp;</span>
             <span v-if="unitBundle.attack"><strong>Attack: </strong> {{ unitBundle.attack }}</span>
           </div>
@@ -73,7 +77,12 @@
     </div>
 
     <!-- Other -->
-    <button @click="generateSimulation()">Generate</button>
+    <button @click="generateCombat()">Generate</button>
+
+    <div v-for="(combat, index) in combats.list" :key="index">
+      <h4>Combat {{ index }}</h4>
+      <p v-for="(line, lineIndex) in combat.log" :key="lineIndex">{{ line }}</p>
+    </div>
   </div>
 </template>
 
@@ -84,6 +93,7 @@ import { mapActions, mapGetters } from 'vuex';
 
 // other imports
 import unitsSaved from '../../mocked-data/units';
+import { random } from 'lodash';
 
 export default {
   name: 'combatSimulation',
@@ -107,7 +117,8 @@ export default {
   computed: {
     ...mapGetters([ 
       'units',
-      'armies'
+      'armies',
+      'combats'
      ]),
   },
   methods: {
@@ -117,18 +128,36 @@ export default {
       'unitUpdate',
       'unitBundleAdd',
       'unitBundleRemove',
-      'unitBundleUpdate'
+      'unitBundleUpdate',
+      'generateCombat'
     ]),
     
     initStoreData() {
       unitsSaved.forEach((unit) => { this.unitAdd({ unit }) });
+      this.generateRandomUnitSets();      
+    },
 
+    generateRandomUnitSets() {
       Object.keys(this.armies).forEach((armyKey) => {
-        for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES_COUNT; i++) { 
-          this.unitBundleAdd({ army: this.armies[armyKey] }); 
+        this.armies[armyKey].unitBundles = [];
+
+        for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES_COUNT; i++) {
+          const randomUnit = this.units.list[random(0, this.units.list.length - 1)];
+          const amount = random(1, 100);
+          this.unitBundleAdd({ 
+            army: this.armies[armyKey],  
+            bundle: {
+              status: 'active',
+              unitType: randomUnit.name, 
+              amount: amount,
+              unit: randomUnit,
+              health: randomUnit.properties.health.value * amount,
+              attack: randomUnit.properties.attack.value * amount
+            }
+          }); 
         }
       })
-    },
+    }
     // generateSimulation() {
     //   let combat = {
     //     status: 'impossible',

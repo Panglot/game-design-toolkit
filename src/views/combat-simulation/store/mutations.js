@@ -45,5 +45,12 @@ export default {
       Vue.set(bundle, 'attack', bundle.unit.properties.attack.value * bundle.amount);
       bundle.status = 'active';
     };
+  },
+
+  combatAdd(state, payload) {
+    state.combats.list.push(payload.combat);
+  },
+  combatsClear(state) {
+    state.combats.list = [];
   }
 }

@@ -1,4 +1,4 @@
-import { merge, cloneDeep } from 'lodash';
+import { uniq, cloneDeep } from 'lodash';
 
 import unitTemplate from '../../../mocked-data/combat-simulation/unit-template';
 import unitBundleTemplate from '../../../mocked-data/combat-simulation/unit-bundle-template';
@@ -54,5 +54,42 @@ export default {
     } else {
       // Logic for update. attacOrder, status and etc.
     }
+  },
+
+  generateCombat({commit, state }, payload) {
+    let turnOrder = [];
+    
+    Object.keys(state.armies).forEach(armyKey => {
+      state.armies[armyKey].unitBundles.forEach(bundle => {
+        if (bundle.unit && bundle.amount){
+          let attackOrder = bundle.unit.properties.attackOrder.value;
+          turnOrder.push(attackOrder);
+        }
+      })
+       
+    });
+
+    turnOrder = uniq(turnOrder);
+    turnOrder.sort();
+
+    let combat = {
+      log: []
+    }
+    
+    for (let index = 0; index < turnOrder.length; index++) {
+      combat.log.push(`Round ${index+1}:`);
+      Object.keys(state.armies).forEach(armyKey => {
+        state.armies[armyKey].unitBundles.forEach((bundle, bundleIndex) => {
+          if(bundle.unit.properties.attackOrder.value === turnOrder[index]){
+            combat.log.push(` ${armyKey}'s ${bundle.amount} ${bundle.unitType}s in position ${bundleIndex} attacks with ${bundle.attack} attack`)
+          }
+        })
+      })
+      
+    }
+    console.log(`! Combat Log !\n ${combat.log.join('\n ')}`);
+    
+    commit('combatsClear');
+    commit('combatAdd', { combat });
   }
 }
