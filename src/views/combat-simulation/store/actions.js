@@ -57,13 +57,14 @@ export default {
   },
 
   generateCombat({commit, state }, payload) {
+    // 1. Create unified turn order
     let turnOrder = [];
     
     Object.keys(state.armies).forEach(armyKey => {
       state.armies[armyKey].unitBundles.forEach(bundle => {
         if (bundle.unit && bundle.amount){
-          let attackOrder = bundle.unit.properties.attackOrder.value;
-          turnOrder.push(attackOrder);
+          let unitTurnOrder = bundle.unit.properties.turnOrder.value;
+          turnOrder.push(unitTurnOrder);
         }
       })
        
@@ -72,22 +73,72 @@ export default {
     turnOrder = uniq(turnOrder);
     turnOrder.sort();
 
+    // 2. Combat create
     let combat = {
-      log: []
+      log: [],
+      rounds: [{
+          turns: [{
+              armies: cloneDeep(state.armies),
+              actions: []
+            }
+          ]
+        }
+      ]
     }
     
-    for (let index = 0; index < turnOrder.length; index++) {
-      combat.log.push(`Round ${index+1}:`);
-      Object.keys(state.armies).forEach(armyKey => {
-        state.armies[armyKey].unitBundles.forEach((bundle, bundleIndex) => {
-          if(bundle.unit.properties.attackOrder.value === turnOrder[index]){
-            combat.log.push(` ${armyKey}'s ${bundle.amount} ${bundle.unitType}s in position ${bundleIndex} attacks with ${bundle.attack} attack`)
+    // 3. Combat simulate
+
+    // Round cycle
+    let currentRound = combat.rounds[0]
+
+    // Turn cycle
+    for (let turnIndex = 0; turnIndex < turnOrder.length; turnIndex++) {
+      combat.log.push(`Тurn ${turnIndex+1}:`);
+
+      // Generate Actions:
+      // each bundle of each army is checked if it is its turn to make action 
+      let currentTurn = currentRound.turns[turnIndex];
+
+      Object.keys(currentTurn.armies).forEach((armyKey) => {
+        
+        currentTurn.armies[armyKey].unitBundles.forEach((bundle, bundleIndex) => {
+          if (bundle.unit.properties.turnOrder.value === turnOrder[turnIndex]) {
+            combat.log.push(` ${armyKey}'s ${bundle.amount} ${bundle.unitType}s in position ${bundleIndex} attacks with ${bundle.attack} attack`);
+
+            const action = {
+              attack: {
+                target: 'front',
+                value: bundle.attack,
+                source: {
+                  army: armyKey,
+                  unit: bundle.unitType,
+                  position: bundleIndex,
+                  amount: bundle.amount
+                }
+              }
+            }
+
+            currentTurn.actions.push(action);
           }
         })
+      })
+
+      // Execute actions 
+      currentTurn.actions.forEach((action, index) => {
+        console.log(action);
+        
+      })
+
+      // Add new turn
+      currentRound.turns.push({
+        armies: cloneDeep(state.armies),
+        actions: []
       })
       
     }
     console.log(`! Combat Log !\n ${combat.log.join('\n ')}`);
+    // console.log(combat.rounds);
+    
     
     commit('combatsClear');
     commit('combatAdd', { combat });

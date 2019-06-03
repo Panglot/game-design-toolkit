@@ -22,7 +22,7 @@ export default [
         name: 'Special',
         value: 0
       },
-      attackOrder: { 
+      turnOrder: { 
         name: 'Attack order',
         value: 1
       }
@@ -51,7 +51,7 @@ export default [
         name: 'Special',
         value: 0
       },
-      attackOrder: { 
+      turnOrder: { 
         name: 'Attack order',
         value: 2
       }

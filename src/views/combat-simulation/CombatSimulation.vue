@@ -144,6 +144,7 @@ export default {
         for (let i = 0; i < this.CONSTANTS.STARTING_BUNDLES_COUNT; i++) {
           const randomUnit = this.units.list[random(0, this.units.list.length - 1)];
           const amount = random(1, 100);
+          
           this.unitBundleAdd({ 
             army: this.armies[armyKey],  
             bundle: {
@@ -158,45 +159,6 @@ export default {
         }
       })
     }
-    // generateSimulation() {
-    //   let combat = {
-    //     status: 'impossible',
-    //     army1: { attackOrder: [] },
-    //     army2: { attackOrder: [] }
-    //   };
-    //   let armyStatus = [
-    //     { hasHealth: false, hasAttack: false },
-    //     { hasHealth: false, hasAttack: false }
-    //   ];
-
-    //   this.armies[0].forEach(unitBundle => {
-    //     if (!armyStatus[0].hasHealth)
-    //       armyStatus[0].hasHealth = unitBundle.totalHP ? true : false;
-    //     if (!armyStatus[0].hasAttack)
-    //       armyStatus[0].hasAttack = unitBundle.totalAttack ? true : false;
-
-    //     if (unitBundle.unit)
-    //       combat.army2.attackOrder.push(
-    //         unitBundle.unit.properties.attackOrder.value
-    //       );
-    //   });
-    //   this.armies[1].forEach(unitBundle => {
-    //     if (!armyStatus[1].hasHealth)
-    //       armyStatus[1].hasHealth = unitBundle.totalHP ? true : false;
-    //     if (!armyStatus[1].hasAttack)
-    //       armyStatus[1].hasAttack = unitBundle.totalAttack ? true : false;
-
-    //     if (unitBundle.unit)
-    //       combat.army2.attackOrder.push(
-    //         unitBundle.unit.properties.attackOrder.value
-    //       );
-    //   });
-
-    //   combat.army1.attackOrder.sort();
-    //   combat.army2.attackOrder.sort();
-
-    //   this.combats.push(combat);
-    // }
   }
 };
 </script>
