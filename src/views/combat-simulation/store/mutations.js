@@ -19,9 +19,21 @@ export default {
 
   unitBundleAdd(state, payload) {
     payload.army.unitBundles.push(payload.bundle);
+    
+    if(payload.bundle.unitType && payload.bundle.amount) {
+      payload.army.status = 'active';
+    } else {
+      payload.army.status = 'inactive';
+    }
   },
   unitBundleRemove(state, payload) {
-    payload.army.unitBundles.splice(payload.unitBundleIndex);
+    const bundles = payload.army.unitBundles;
+    
+    bundles.splice(payload.unitBundleIndex);
+    
+    if (!bundles.length) {
+      payload.army.status = 'inactive';
+    }
   },
   unitBundleUpdate(state, payload) {
     const bundle = payload.unitBundle;
@@ -39,11 +51,13 @@ export default {
     if (!(bundle.unitType && parseInt(bundle.amount))) {
       bundle.health = null;
       bundle.attack = null;
-      bundle.status = 'ignore';
+      bundle.status = 'inactive';
+      state.armies[payload.armyKey].status = 'inactive';
     } else {
       Vue.set(bundle, 'health', bundle.unit.properties.health.value * bundle.amount);
       Vue.set(bundle, 'attack', bundle.unit.properties.attack.value * bundle.amount);
       bundle.status = 'active';
+      state.armies[payload.armyKey].status = 'active';
     };
   },
 

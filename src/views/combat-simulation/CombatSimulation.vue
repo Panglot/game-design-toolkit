@@ -46,7 +46,8 @@
           <select
             @change="unitBundleUpdate({
                 unitBundle,
-                update: { unitType: $event.target.value }
+                update: { unitType: $event.target.value },
+                armyKey
             })">
             <option value></option>
             <option v-for="(unit, index) in units.list" :key="index" :value="unit.name">{{ unit.name }}</option>
@@ -134,7 +135,8 @@ export default {
     
     initStoreData() {
       unitsSaved.forEach((unit) => { this.unitAdd({ unit }) });
-      this.generateRandomUnitSets();      
+      this.generateRandomUnitSets();    
+      this.generateCombat();  
     },
 
     generateRandomUnitSets() {
