@@ -76,20 +76,21 @@ export default {
       // Turn cycle
       for (let turn = 0; turn < turnOrder.length; turn++) {
         // Start of turn
-        console.log('Turn ', turn);
+        // console.log('Turn ', turn);
         
-        
+          // Determine the units that take action this turn
         let playerArmyActions = state.armies.playerArmy.unitBundles.filter(bundle => bundle.unit.properties.turnOrder.value === turnOrder[turn]);
         let enemyArmyActions = state.armies.enemyArmy.unitBundles.filter(bundle => bundle.unit.properties.turnOrder.value === turnOrder[turn]);
-        console.log('Player actions: ', playerArmyActions);
-        console.log('Enemy actions: ', enemyArmyActions);
+        // console.log('Player actions: ', playerArmyActions);
+        // console.log('Enemy actions: ', enemyArmyActions);
         
+        
+          // Calculate damage
         let enemyDamageTaken = 0;
         playerArmyActions.forEach((action) => {
           enemyDamageTaken += action.attack;
         });
-        
-        
+                
         let playerDamageTaken = 0;
         enemyArmyActions.forEach((action) => {
           playerDamageTaken += action.attack;
@@ -99,94 +100,65 @@ export default {
         
         
         // End of turn
+        
+          // Apply damage
+        for (let position = 0; enemyDamageTaken > 0 && position < state.armies.enemyArmy.unitBundles.length; position++) {
+          let bundle = state.armies.enemyArmy.unitBundles[position];
+          
+          if (bundle.status !== 'dead') {
+            bundle.health = bundle.health - enemyDamageTaken;
+            
+            if (bundle.health <= 0) {
+              bundle.status = 'dead';
+              bundle.amount = 0;
+              enemyDamageTaken = Math.abs(bundle.health);
+              bundle.health = 0;              
+            } else {
+              bundle.amount = Math.ceil(bundle.health / bundle.unit.properties.health.value);
+            }
+          }          
+        }
+        
+        
+        for (let position = 0; playerDamageTaken > 0 && position < state.armies.playerArmy.unitBundles.length; position++) {
+          const bundle = state.armies.playerArmy.unitBundles[position];
+          
+          if (bundle.status !== 'dead') {
+            bundle.health = bundle.health - playerDamageTaken;
+            
+            if (bundle.health <= 0) {
+              bundle.status = 'dead';
+              bundle.amount = 0;
+              playerDamageTaken = Math.abs(bundle.health);
+              bundle.health = 0;              
+            } else {
+              bundle.amount = Math.ceil(bundle.health / bundle.unit.properties.health.value);
+            }
+          }          
+        }
+        
+        
+        // Evaluate armies
+        let defeated = true;
+        state.armies.playerArmy.unitBundles.forEach((bundle) => {
+          if (bundle.status !== 'dead') {
+            defeated = false;
+          }
+        })
+        if (defeated) { state.armies.playerArmy.status = 'defeated'; }
+        
+        defeated = true;
+        state.armies.enemyArmy.unitBundles.forEach((bundle) => {
+          if (bundle.status !== 'dead') {
+            defeated = false;
+          }
+        })
+        if (defeated) { state.armies.enemyArmy.status = 'defeated'; }
+        
+        
+        console.log(state.armies);
+        
       }
     // }
-    
-    
-    // // 1. Create unified turn order
-    // let turnOrder = [];
-    
-    // Object.keys(state.armies).forEach(armyKey => {
-    //   state.armies[armyKey].unitBundles.forEach(bundle => {
-    //     if (bundle.unit && bundle.amount){
-    //       let unitTurnOrder = bundle.unit.properties.turnOrder.value;
-    //       turnOrder.push(unitTurnOrder);
-    //     }
-    //   })
-       
-    // });
-
-    // turnOrder = uniq(turnOrder);
-    // turnOrder.sort();
-
-    // // 2. Combat create
-    // let combat = {
-    //   log: [],
-    //   rounds: [{
-    //       turns: [{
-    //           armies: cloneDeep(state.armies),
-    //           actions: []
-    //         }
-    //       ]
-    //     }
-    //   ]
-    // }
-    
-    // // 3. Combat simulate
-
-    // // Round cycle
-    // let currentRound = combat.rounds[0]
-
-    // // Turn cycle
-    // for (let turnIndex = 0; turnIndex < turnOrder.length; turnIndex++) {
-    //   combat.log.push(`Тurn ${turnIndex+1}:`);
-
-    //   // Generate Actions:
-    //   // each bundle of each army is checked if it is its turn to make action 
-    //   let currentTurn = currentRound.turns[turnIndex];
-
-    //   Object.keys(currentTurn.armies).forEach((armyKey) => {
-        
-    //     currentTurn.armies[armyKey].unitBundles.forEach((bundle, bundleIndex) => {
-    //       if (bundle.unit.properties.turnOrder.value === turnOrder[turnIndex]) {
-    //         combat.log.push(` ${armyKey}'s ${bundle.amount} ${bundle.unitType}s in position ${bundleIndex} attacks with ${bundle.attack} attack`);
-
-    //         const action = {
-    //           attack: {
-    //             target: 'front',
-    //             value: bundle.attack,
-    //             source: {
-    //               army: armyKey,
-    //               unit: bundle.unitType,
-    //               position: bundleIndex,
-    //               amount: bundle.amount
-    //             }
-    //           }
-    //         }
-
-    //         currentTurn.actions.push(action);
-    //       }
-    //     })
-    //   })
-
-    //   // Execute actions 
-    //   currentTurn.actions.forEach((action, index) => {
-    //     console.log(action);
-        
-    //   })
-
-    //   // Add new turn
-    //   currentRound.turns.push({
-    //     armies: cloneDeep(state.armies),
-    //     actions: []
-    //   })
-      
-    // }
-    // console.log(`! Combat Log !\n ${combat.log.join('\n ')}`);
-    // // console.log(combat.rounds);
-    
-    
-    // commit('combatsClear');
-    // commit('combatAdd', { combat });
   }
 }

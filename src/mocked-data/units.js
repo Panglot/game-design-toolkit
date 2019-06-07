@@ -58,15 +58,15 @@ export default [
     }
   },
   {
-    name: '1',
+    name: 'Skeleton',
     properties: {
       attack: {
         name: 'Attack',
-        value: 11
+        value: 1
       },
       health: {
         name: 'HP',
-        value: 11
+        value: 2
       },
       physicalDefense: {
         name: 'Armor',
@@ -87,15 +87,15 @@ export default [
     }
   },
   {
-    name: '123',
+    name: 'Begemot',
     properties: {
       attack: {
         name: 'Attack',
-        value: 123
+        value: 30
       },
       health: {
         name: 'HP',
-        value: 123
+        value: 100
       },
       physicalDefense: {
         name: 'Armor',
