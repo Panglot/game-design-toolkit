@@ -64,9 +64,42 @@ export default {
       .sort((a, b) => { return a - b; })
     )
     
-    // while ((state.armies.playerArmy.status !== 'defeated') && (state.armies.enemyArmy.status !== 'defeated')) {
-    //   console.log('.');
-      
+    console.log('Turn order: ', turnOrder);
+    
+    
+    // Round cycle
+    // for (let failSafe = 0; 
+      // failSafe < 10
+      //   && (state.armies.playerArmy.status !== 'defeated' 
+      //   || state.armies.playerArmy.status !== 'defeated'); 
+      // failSafe++) {      
+      // Turn cycle
+      for (let turn = 0; turn < turnOrder.length; turn++) {
+        // Start of turn
+        console.log('Turn ', turn);
+        
+        
+        let playerArmyActions = state.armies.playerArmy.unitBundles.filter(bundle => bundle.unit.properties.turnOrder.value === turnOrder[turn]);
+        let enemyArmyActions = state.armies.enemyArmy.unitBundles.filter(bundle => bundle.unit.properties.turnOrder.value === turnOrder[turn]);
+        console.log('Player actions: ', playerArmyActions);
+        console.log('Enemy actions: ', enemyArmyActions);
+        
+        let enemyDamageTaken = 0;
+        playerArmyActions.forEach((action) => {
+          enemyDamageTaken += action.attack;
+        });
+        
+        
+        let playerDamageTaken = 0;
+        enemyArmyActions.forEach((action) => {
+          playerDamageTaken += action.attack;
+        });
+        
+        console.log(`Enemy damage: ${enemyDamageTaken}\nPlayer damage: ${playerDamageTaken}`);
+        
+        
+        // End of turn
+      }
     // }
     
     
