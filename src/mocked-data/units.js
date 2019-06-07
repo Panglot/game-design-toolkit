@@ -85,34 +85,5 @@ export default [
         value: 11
       }
     }
-  },
-  {
-    name: 'Begemot',
-    properties: {
-      attack: {
-        name: 'Attack',
-        value: 30
-      },
-      health: {
-        name: 'HP',
-        value: 100
-      },
-      physicalDefense: {
-        name: 'Armor',
-        value: 0
-      },
-      magicalDefense: {
-        name: 'Magic Resist',
-        value: 0
-      },
-      specialLevel: {
-        name: 'Special',
-        value: 0
-      },
-      turnOrder: { 
-        name: 'Attack order',
-        value: 123
-      }
-    }
   }
 ];
