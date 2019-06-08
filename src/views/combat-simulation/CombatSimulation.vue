@@ -80,8 +80,9 @@
     <!-- Other -->
     <button @click="generateCombat()">Generate</button>
 
+    <!-- Combat log -->
     <div v-for="(combat, index) in combats.list" :key="index">
-      <h4>Combat {{ index }}</h4>
+      <h4>Combat</h4>
       <p v-for="(line, lineIndex) in combat.log" :key="lineIndex">{{ line }}</p>
     </div>
   </div>
@@ -168,6 +169,10 @@ export default {
 <style lang="scss">
 .simulation {
   text-align: center;
+
+  .align-left {
+    text-align: left;
+  }
 
   h1,
   h2,

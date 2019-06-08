@@ -56,9 +56,14 @@ export default {
     }
   },
 
-  generateCombat({commit, state }, payload) {
+  generateCombat({commit, dispatch, state }, payload) {
     let playerArmy = cloneDeep(state.armies.playerArmy);
     let enemyArmy = cloneDeep(state.armies.enemyArmy);
+
+    state.combats.list = [];
+    state.combats.list.push({log:[]});
+    let combat = state.combats.list[0];
+    
     // debugger;
     // 1. Create the combat turn order
     let turnOrder = uniq(
@@ -67,16 +72,21 @@ export default {
       .sort((a, b) => { return a - b; })
     )
     
+    combat.log.push('Starting combat');
+    combat.log.push('Armies: ');
+    dispatch('armyToString', { army: playerArmy, armyKey: 'playerArmy' });
+    dispatch('armyToString', { army: enemyArmy, armyKey:  'enemyArmy' });
     console.log('Turn order: ', turnOrder);
     
     
     // Round cycle
-    for (let failSafe = 0; 
-      failSafe < 10
+    for (let round = 0; 
+      round < 1000
         && (playerArmy.status !== 'defeated' 
         && enemyArmy.status !== 'defeated'); 
-      failSafe++) {
-        console.log('Round ', failSafe);
+      round++) {
+        console.log('Round ', round);
+        combat.log.push(`Round ${round+1}`);
         console.log('# Armies:');
         console.log(' % playerArmy: ', playerArmy);
         console.log(' % enemyArmy: ', enemyArmy);        
@@ -85,6 +95,7 @@ export default {
       for (let turn = 0; turn < turnOrder.length; turn++) {
         // Start of turn
         console.log(' Turn ', turn);
+        combat.log.push(` Turn ${turn+1}, acting units with speed ${turnOrder[turn]}`);
         
           // Determine the units that take action this turn
         let playerArmyActions = playerArmy.unitBundles.filter(bundle => bundle.unit.properties.turnOrder.value === turnOrder[turn]);
@@ -105,6 +116,7 @@ export default {
         });
         
         console.log(` # Enemy damage: ${enemyDamageTaken}\n # Player damage: ${playerDamageTaken}`);
+        combat.log.push(` # Enemy damage: ${enemyDamageTaken}`,` # Player damage: ${playerDamageTaken}`);
         
         
         // End of turn
@@ -145,6 +157,9 @@ export default {
           }          
         }
         
+        combat.log.push(`Armies after round ${round+1} turn ${turn+1}: `);        
+        dispatch('armyToString', { army: playerArmy, armyKey: 'playerArmy' });
+        dispatch('armyToString', { army: enemyArmy, armyKey: 'enemyArmy' });
         
         // Evaluate armies
         let defeated = true;
@@ -153,7 +168,10 @@ export default {
             defeated = false;
           }
         })
-        if (defeated) { playerArmy.status = 'defeated'; }
+        if (defeated) { 
+          playerArmy.status = 'defeated'; 
+          combat.log.push('Player army defeated!!');
+        }
         
         defeated = true;
         enemyArmy.unitBundles.forEach((bundle) => {
@@ -161,14 +179,28 @@ export default {
             defeated = false;
           }
         })
-        if (defeated) { enemyArmy.status = 'defeated'; }  
+        if (defeated) { 
+          enemyArmy.status = 'defeated';
+          combat.log.push('Enemy army defeated!!');
+        }  
         
         if (enemyArmy.status === 'defeated' || playerArmy.status === 'defeated') {
           break;
         }
       }
         
-      console.log('\n\n');
     }
+  },
+  armyToString({state}, payload) {
+    let log = []
+    console.log(payload.armyKey);
+    
+
+    payload.armyKey === 'playerArmy' ? log.push('Player army: ') : log.push('Enemy army: ');
+    payload.army.unitBundles.forEach((bundle) => {
+      log.push(`#${bundle.amount} ${bundle.unitType}s, AT: ${bundle.attack} HP: ${bundle.health}`);
+    })
+
+    state.combats.list[0].log.push(...log);
   }
 }
